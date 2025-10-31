@@ -5,69 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taller API del Clima (Python + Flask)</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- Fuentes y Reseteo Básico --- */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        
+        /* --- Variables de Color (Estilo HALO/Sci-Fi) --- */
+        :root {
+            --color-fondo: #0a0c1a; /* Azul casi negro */
+            --color-tarjeta: rgba(10, 20, 40, 0.5); /* Vidrio oscuro */
+            --color-sombra: rgba(0, 230, 255, 0.1);
+            --color-borde: rgba(0, 230, 255, 0.2); /* Borde Cian */
+            --color-texto-principal: #f0f4f8; /* Blanco-gris */
+            --color-texto-secundario: #8a9baf; /* Gris-azul */
+            
+            /* El color clave del "HALO" */
+            --color-neon-cian: #00e6ff;
+            --color-neon-cian-hover: #99f5ff;
+            --color-neon-sombra: 0 0 10px #00e6ff, 0 0 20px #00e6ff, 0 0 30px #00e6ff;
+            
+            --color-error-fondo: rgba(255, 0, 60, 0.1);
+            --color-error-texto: #ff8a9b;
+            --color-error-borde: #ff003c;
+        }
+
         body {
-            /* Usamos la nueva fuente 'Inter' con un buen respaldo */
             font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             
-            /* Fondo con gradiente moderno */
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            /* Fondo de espacio profundo */
+            background-color: var(--color-fondo);
+            background-image: radial-gradient(ellipse at 70% 30%, rgba(0, 100, 150, 0.15) 0%, transparent 60%),
+                              radial-gradient(ellipse at 30% 70%, rgba(40, 0, 80, 0.15) 0%, transparent 60%);
             
-            color: #333;
+            color: var(--color-texto-principal);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 3rem 1rem;
             box-sizing: border-box;
         }
 
-        /* --- La Tarjeta Principal (Glassmorphism) --- */
+        /* --- Tarjeta Principal (Interfaz de Vidrio Oscuro) --- */
         .container {
-            /* Fondo blanco semitransparente */
-            background: rgba(255, 255, 255, 0.85);
-            
-            /* Efecto de desenfoque del fondo (clave para el "vidrio") */
-            backdrop-filter: blur(10px);
-            
-            border-radius: 16px; /* Bordes más redondeados */
-            
-            /* Sombra más suave y pronunciada */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            
-            /* Borde sutil */
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            
+            background: var(--color-tarjeta);
+            backdrop-filter: blur(15px) saturate(180%);
+            border-radius: 20px;
+            box-shadow: 0 0 25px var(--color-sombra); /* El halo exterior */
+            border: 1px solid var(--color-borde);
             padding: 2.5rem 3rem;
             width: 100%;
-            max-width: 450px; /* Un poco más ancha */
+            max-width: 480px;
             text-align: center;
+            transition: all 0.3s ease;
         }
 
-        /* --- Título --- */
+        /* --- Título (Con brillo sutil) --- */
         h1 {
-            color: #2c3e50;
+            color: #ffffff;
             font-weight: 700;
             font-size: 1.8rem;
             margin-top: 0;
-            margin-bottom: 2rem; /* Más espacio */
+            margin-bottom: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
+            text-shadow: 0 0 5px rgba(255,255,255,0.5);
         }
         
-        /* Icono del sol en el título */
         h1::before {
-            content: '☀️';
+            content: '🛰️'; /* Icono de satélite */
             font-size: 2.2rem;
         }
 
-        /* --- Formulario (Input y Botón) --- */
+        /* --- Formulario (Estilo Tech) --- */
         form {
             display: flex;
             gap: 12px;
@@ -76,114 +89,192 @@
 
         input[type="text"] {
             flex-grow: 1;
-            border: 1px solid #dcdcdc;
-            border-radius: 10px; /* Más redondeado */
+            background: rgba(0, 0, 0, 0.3); /* Fondo oscuro */
+            border: 1px solid var(--color-borde);
+            border-radius: 10px;
             padding: 1rem;
             font-size: 1rem;
             font-family: "Inter", sans-serif;
+            color: var(--color-texto-principal); /* Texto claro */
             transition: all 0.3s ease;
         }
         
-        /* Efecto de "foco" en el input */
+        input[type="text"]::placeholder {
+            color: var(--color-texto-secundario);
+        }
+        
+        /* Efecto de foco: el HALO aparece */
         input[type="text"]:focus {
             outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 4px rgba(0,123,255,0.1);
+            border-color: var(--color-neon-cian);
+            box-shadow: 0 0 10px var(--color-neon-cian);
         }
 
         button {
-            /* Gradiente en el botón */
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            color: white;
-            border: none;
+            background: transparent; /* Transparente al inicio */
+            color: var(--color-neon-cian);
+            border: 2px solid var(--color-neon-cian);
             border-radius: 10px;
             padding: 1rem 1.5rem;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            
-            /* Sombra para darle "profundidad" */
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
-            
-            /* Transición suave */
+            text-shadow: 0 0 5px var(--color-neon-cian);
+            box-shadow: 0 0 5px var(--color-neon-cian);
             transition: all 0.3s ease;
         }
 
-        /* Efecto al pasar el mouse sobre el botón */
         button:hover {
-            transform: translateY(-2px); /* Eleva el botón */
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+            background: var(--color-neon-cian);
+            color: var(--color-fondo); /* Texto oscuro al pasar */
+            box-shadow: var(--color-neon-sombra); /* Efecto HALO */
+            transform: translateY(-2px);
+            text-shadow: none;
         }
 
-        /* --- Sección de Resultados (Rediseñada) --- */
+        /* --- Sección de Resultados (Principal) --- */
         .resultado {
             margin-top: 2rem;
             text-align: left;
-            padding: 2rem;
-            
-            /* Eliminamos el borde punteado, usamos un fondo sólido */
-            border: none;
-            border-radius: 12px;
-            background: #f8f9fa;
-            
-            /* Sombra interna para un look "presionado" */
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
         }
 
-        .resultado h2 {
-            margin-top: 0;
-            margin-bottom: 1.5rem; /* Más espacio */
-            color: #333;
-            font-size: 2.2rem; /* Título más grande */
+        /* --- Tarjeta de Resumen (Ciudad y Temp) --- */
+        .resumen-principal {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--color-borde);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .resumen-principal .info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .resumen-principal h2 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1.8rem;
             font-weight: 700;
+        }
+        
+        .resumen-principal p {
+            margin: 0.25rem 0 0;
+            font-size: 1.1rem;
+            color: var(--color-neon-cian); /* Descripción en cian */
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        
+        .resumen-principal .temperatura {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1;
+            /* El HALO más fuerte, en la temperatura */
+            text-shadow: 0 0 10px #ffffff, 0 0 20px var(--color-neon-cian-hover);
+        }
+        
+        .resumen-principal img {
+            width: 80px;
+            height: 80px;
+            margin-right: -10px;
+            /* Filtro para que el icono parezca parte del UI */
+            filter: drop-shadow(0 0 5px var(--color-neon-cian));
+        }
+
+        /* --- Cuadrícula de Detalles (Humedad, Viento, Presión) --- */
+        .detalles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+        }
+
+        .detalle-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--color-borde);
+            transition: all 0.3s ease;
+        }
+        
+        .detalle-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--color-neon-cian-hover);
+            box-shadow: 0 0 10px var(--color-sombra);
+        }
+
+        .detalle-card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--color-texto-secundario); /* Título en gris */
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            /* Línea sutil debajo del título */
-            border-bottom: 2px solid #eee;
-            padding-bottom: 1rem;
-        }
-        
-        /* Hacemos el icono del clima más grande */
-        .resultado img {
-            width: 64px;
-            height: 64px;
         }
 
-        .resultado p {
-            font-size: 1.15rem;
-            line-height: 1.7;
-            margin: 0.8rem 0;
-            color: #555;
-        }
-        
-        /* Estilo para los "labels" (Temperatura, Descripción) */
-        .resultado p strong {
-            color: #111;
-            font-weight: 600;
-            min-width: 120px; /* Alinea los valores */
+        /* Iconos para las tarjetas de detalles */
+        .detalle-card h3::before {
             display: inline-block;
+            margin-right: 8px;
+            font-size: 1.2rem;
+            color: var(--color-neon-cian); /* Iconos en cian */
+            text-shadow: 0 0 3px var(--color-neon-cian);
+        }
+        
+        .detalle-card.humedad h3::before { content: '💧'; }
+        .detalle-card.viento h3::before { content: '💨'; }
+        .detalle-card.presion h3::before { content: '🌡️'; }
+        
+        .detalle-card .valor {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--color-texto-principal);
+        }
+        
+        .detalle-card .valor .unidad {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--color-texto-secundario);
+            margin-left: 4px;
         }
 
-        /* --- Mensaje de Error (Rediseñado) --- */
+        /* --- Mensaje de Error (Estilo Sci-Fi) --- */
         .error {
             margin-top: 1.5rem;
-            color: #D8000C; /* Rojo oscuro */
-            background-color: #FFD2D2; /* Fondo rojo claro */
-            border: 1px solid #D8000C;
-            border-radius: 8px;
+            color: var(--color-error-texto);
+            background-color: var(--color-error-fondo);
+            border: 1px solid var(--color-error-borde);
+            border-radius: 10px;
             padding: 1rem;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-shadow: 0 0 5px var(--color-error-texto);
+        }
+        
+        .error::before {
+            content: '⚠️';
+            font-size: 1.2rem;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Consulta del Clima</h1>
+        <h1>Sistema de Clima</h1>
         
         <form action="/" method="POST">
-            <input type="text" name="ciudad" placeholder="Escribe una ciudad..." 
+            <input type="text" name="ciudad" placeholder="Ingresar designación de ciudad..." 
                    value="{{ request.form['ciudad'] if request.form else '' }}">
             <button type="submit">Consultar</button>
         </form>
@@ -195,18 +286,38 @@
                 
             {% else %}
                 <div class="resultado">
-                    <h2>
-                        <img src="http://openweathermap.org/img/wn/{{ clima.icono }}@2x.png" alt="Icono del clima">
-                        {{ clima.ciudad }}
-                    </h2>
-                    
-                    <p><strong>Temperatura:</strong> {{ "%.1f"|format(clima.temperatura) }} °C</p>
-                    <p><strong>Descripción:</strong> {{ clima.descripcion.capitalize() }}</p>
-                    
-                    <p><strong>Humedad:</strong> {{ clima.humedad }} %</p>
-                    <p><strong>Presión:</strong> {{ clima.presion }} hPa</p>
-                    <p><strong>Viento:</strong> {{ "%.2f"|format(clima.viento) }} m/s</p>
+                
+                    <div class="resumen-principal">
+                        <div class="info">
+                            <h2>{{ clima.ciudad }}</h2>
+                            <p>{{ clima.descripcion.capitalize() }}</p>
+                        </div>
+                        <div class="icono-temp">
+                            <img src="http://openweathermap.org/img/wn/{{ clima.icono }}@2x.png" alt="Icono del clima">
+                            <span class="temperatura">{{ "%.0f"|format(clima.temperatura) }}°</span>
+                        </div>
                     </div>
+                    
+                    <div class="detalles-grid">
+                        
+                        <div class="detalle-card humedad">
+                            <h3>Humedad</h3>
+                            <p class="valor">{{ clima.humedad }}<span class="unidad">%</span></p>
+                        </div>
+                        
+                        <div class="detalle-card viento">
+                            <h3>Viento</h3>
+                            <p class="valor">{{ "%.1f"|format(clima.viento) }}<span class="unidad">m/s</span></p>
+                        </div>
+                        
+                        <div class="detalle-card presion">
+                            <h3>Presión</h3>
+                            <p class="valor">{{ clima.presion }}<span class="unidad">hPa</span></p>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
             {% endif %}
             
         {% endif %}
