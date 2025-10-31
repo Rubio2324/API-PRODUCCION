@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller API del Clima (Python + Flask)</title>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            padding: 2.5rem;
+            width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            padding: 0.8rem;
+            font-size: 1rem;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Sección de Resultados */
+        .resultado {
+            margin-top: 1.5rem;
+            text-align: left;
+            padding: 1.5rem;
+            border: 1px dashed #3498db;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        .resultado h2 {
+            margin-top: 0;
+            color: #3498db;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .resultado p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 0.5rem 0;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>☀️ Consulta del Clima</h1>
+        
+        <form action="/" method="POST">
+            <input type="text" name="ciudad" placeholder="Escribe una ciudad..." 
+                   value="{{ request.form['ciudad'] if request.form else '' }}">
+            <button type="submit">Consultar</button>
+        </form>
+
+        {% if clima %}
+        
+            {% if clima.error %}
+                <p class="error">{{ clima.error }}</p>
+                
+            {% else %}
+                <div class="resultado">
+                    <h2>
+                        <img src="http://openweathermap.org/img/wn/{{ clima.icono }}@2x.png" alt="Icono del clima">
+                        {{ clima.ciudad }}
+                    </h2>
+                    <p><strong>Temperatura:</strong> {{ "%.1f"|format(clima.temperatura) }} °C</p>
+                    <p><strong>Descripción:</strong> {{ clima.descripcion.capitalize() }}</p>
+                </div>
+            {% endif %}
+            
+        {% endif %}
+
+    </div>
+
+</body>
+</html>
