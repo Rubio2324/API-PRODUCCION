@@ -1,5 +1,3 @@
-# Archivo: app.py
-
 import requests
 from flask import Flask, render_template, request
 
@@ -27,6 +25,13 @@ def obtener_clima(ciudad):
         clima = {
             "ciudad": datos_clima.get("name"),
             "temperatura": datos_clima.get("main", {}).get("temp"),
+            
+            # --- CAMPOS NUEVOS AÑADIDOS ---
+            "humedad": datos_clima.get("main", {}).get("humidity"),
+            "presion": datos_clima.get("main", {}).get("pressure"),
+            "viento": datos_clima.get("wind", {}).get("speed"),
+            # -----------------------------------
+            
             "descripcion": datos_clima.get("weather", [{}])[0].get("description", "No disponible"),
             "icono": datos_clima.get("weather", [{}])[0].get("icon"), # Icono del clima
             "error": None
@@ -35,6 +40,7 @@ def obtener_clima(ciudad):
     
     except requests.exceptions.HTTPError as err:
         if err.response.status_code == 404:
+            # Capturamos el error 404 (Ciudad no encontrada)
             return {"error": f"Ciudad '{ciudad}' no encontrada."}
         else:
             return {"error": f"Error de API: {err}"}
@@ -56,6 +62,9 @@ def index():
         ciudad = request.form["ciudad"] # Obtiene la ciudad del formulario
         if ciudad:
             datos_clima = obtener_clima(ciudad)
+        else:
+            # Manejo si el usuario da clic sin escribir nada
+            datos_clima = {"error": "Por favor, escribe el nombre de una ciudad."}
             
     # Muestra la página HTML y le pasa los datos del clima (si existen)
     return render_template("index.html", clima=datos_clima)

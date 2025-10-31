@@ -6,89 +6,181 @@
     <title>Taller API del Clima (Python + Flask)</title>
     
     <style>
+        /* --- Fuentes y Reseteo Básico --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f4f8;
+            /* Usamos la nueva fuente 'Inter' con un buen respaldo */
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            
+            /* Fondo con gradiente moderno */
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            
             color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 90vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
+
+        /* --- La Tarjeta Principal (Glassmorphism) --- */
         .container {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            padding: 2.5rem;
-            width: 400px;
+            /* Fondo blanco semitransparente */
+            background: rgba(255, 255, 255, 0.85);
+            
+            /* Efecto de desenfoque del fondo (clave para el "vidrio") */
+            backdrop-filter: blur(10px);
+            
+            border-radius: 16px; /* Bordes más redondeados */
+            
+            /* Sombra más suave y pronunciada */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            
+            /* Borde sutil */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            
+            padding: 2.5rem 3rem;
+            width: 100%;
+            max-width: 450px; /* Un poco más ancha */
             text-align: center;
         }
+
+        /* --- Título --- */
         h1 {
             color: #2c3e50;
             font-weight: 700;
-            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 2rem; /* Más espacio */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
+        
+        /* Icono del sol en el título */
+        h1::before {
+            content: '☀️';
+            font-size: 2.2rem;
+        }
+
+        /* --- Formulario (Input y Botón) --- */
         form {
             display: flex;
-            gap: 10px;
-            margin-bottom: 2rem;
+            gap: 12px;
+            margin-bottom: 1.5rem;
         }
+
         input[type="text"] {
             flex-grow: 1;
             border: 1px solid #dcdcdc;
-            border-radius: 8px;
-            padding: 0.8rem;
+            border-radius: 10px; /* Más redondeado */
+            padding: 1rem;
             font-size: 1rem;
+            font-family: "Inter", sans-serif;
+            transition: all 0.3s ease;
         }
+        
+        /* Efecto de "foco" en el input */
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 4px rgba(0,123,255,0.1);
+        }
+
         button {
-            background-color: #3498db;
+            /* Gradiente en el botón */
+            background: linear-gradient(45deg, #007bff, #0056b3);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            
+            /* Sombra para darle "profundidad" */
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+            
+            /* Transición suave */
+            transition: all 0.3s ease;
         }
+
+        /* Efecto al pasar el mouse sobre el botón */
         button:hover {
-            background-color: #2980b9;
+            transform: translateY(-2px); /* Eleva el botón */
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
         }
-        
-        /* Sección de Resultados */
+
+        /* --- Sección de Resultados (Rediseñada) --- */
         .resultado {
-            margin-top: 1.5rem;
+            margin-top: 2rem;
             text-align: left;
-            padding: 1.5rem;
-            border: 1px dashed #3498db;
-            border-radius: 8px;
-            background-color: #f8f9fa;
+            padding: 2rem;
+            
+            /* Eliminamos el borde punteado, usamos un fondo sólido */
+            border: none;
+            border-radius: 12px;
+            background: #f8f9fa;
+            
+            /* Sombra interna para un look "presionado" */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
         }
+
         .resultado h2 {
             margin-top: 0;
-            color: #3498db;
-            font-size: 1.8rem;
+            margin-bottom: 1.5rem; /* Más espacio */
+            color: #333;
+            font-size: 2.2rem; /* Título más grande */
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            /* Línea sutil debajo del título */
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
         }
+        
+        /* Hacemos el icono del clima más grande */
+        .resultado img {
+            width: 64px;
+            height: 64px;
+        }
+
         .resultado p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin: 0.5rem 0;
+            font-size: 1.15rem;
+            line-height: 1.7;
+            margin: 0.8rem 0;
+            color: #555;
         }
+        
+        /* Estilo para los "labels" (Temperatura, Descripción) */
+        .resultado p strong {
+            color: #111;
+            font-weight: 600;
+            min-width: 120px; /* Alinea los valores */
+            display: inline-block;
+        }
+
+        /* --- Mensaje de Error (Rediseñado) --- */
         .error {
-            color: #e74c3c;
-            font-weight: bold;
             margin-top: 1.5rem;
+            color: #D8000C; /* Rojo oscuro */
+            background-color: #FFD2D2; /* Fondo rojo claro */
+            border: 1px solid #D8000C;
+            border-radius: 8px;
+            padding: 1rem;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>☀️ Consulta del Clima</h1>
+        <h1>Consulta del Clima</h1>
         
         <form action="/" method="POST">
             <input type="text" name="ciudad" placeholder="Escribe una ciudad..." 
@@ -107,9 +199,14 @@
                         <img src="http://openweathermap.org/img/wn/{{ clima.icono }}@2x.png" alt="Icono del clima">
                         {{ clima.ciudad }}
                     </h2>
+                    
                     <p><strong>Temperatura:</strong> {{ "%.1f"|format(clima.temperatura) }} °C</p>
                     <p><strong>Descripción:</strong> {{ clima.descripcion.capitalize() }}</p>
-                </div>
+                    
+                    <p><strong>Humedad:</strong> {{ clima.humedad }} %</p>
+                    <p><strong>Presión:</strong> {{ clima.presion }} hPa</p>
+                    <p><strong>Viento:</strong> {{ "%.2f"|format(clima.viento) }} m/s</p>
+                    </div>
             {% endif %}
             
         {% endif %}
